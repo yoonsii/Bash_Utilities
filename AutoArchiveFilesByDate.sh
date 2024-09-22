@@ -4,21 +4,36 @@
 ##are y days old
 
 #Set target and backup folders
-target_folder="./target"
-archive_folder="./target/bak"
+TARGET_FOLDER="./target"
+ARCHIVE_FOLDER="./target/bak"
 
-age_to_archive=30
-age_to_delete=60
+AGE_TO_ARCHIVE=30
+AGE_TO_DELETE=60
+
+LOG_FILE="archiving.log"
 
 #Ensure folders exist
 
-mkdir -p $target_folder
-mkdir -p $archive_folder
+#mkdir -p $TARGET_FOLDER
+#mkdir -p $ARCHIVE_FOLDER
 
-find $target_folder -maxdepth 1 -type f -mtime +${age_to_archive} -exec echo {} moved to ${archive_folder} >> archiving.log \;
-find $target_folder -maxdepth 1 -type f -mtime +${age_to_archive} -exec mv {} ${archive_folder} \;
+if [ ! -d "${TARGET_FOLDER}" ]; then
+	mkdir -p "${TARGET_FOLDER}"
+fi
 
+if [ ! -d "${ARCHIVE_FOLDER}" ]; then
+	mkdir -p "${ARCHIVE_FOLDER}"
+fi
 
-find $archive_folder -maxdepth 1 -type f -mtime +${age_to_delete} -exec echo {} deleted from archive folder >> archiving.log  \;
-find $archive_folder -maxdepth 1 -type f -mtime +${age_to_delete} -exec rm {}  \;
+echo "====$(date '+%Y-%m-%d %H:%M:%S')=====" >> ${LOG_FILE} 
+echo "Script Starting" >> ${LOG_FILE}
+
+find $TARGET_FOLDER -maxdepth 1 -type f -mtime +${AGE_TO_ARCHIVE} -exec echo {} moved to ${ARCHIVE_FOLDER} >> ${LOG_FILE} \; 
+
+find $TARGET_FOLDER -maxdepth 1 -type f -mtime +${AGE_TO_ARCHIVE} -exec mv {} ${ARCHIVE_FOLDER} \; 
+
+find $ARCHIVE_FOLDER -maxdepth 1 -type f -mtime +${AGE_TO_DELETE} -exec echo {} deleted from archive folder >> ${LOG_FILE} \;
+
+find $ARCHIVE_FOLDER -maxdepth 1 -type f -mtime +${AGE_TO_DELETE} -exec rm {}  \;
+echo "Script Finished" >> ${LOG_FILE}
 
